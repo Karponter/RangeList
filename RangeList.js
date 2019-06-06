@@ -31,10 +31,18 @@ class RangeList {
     return [Math.min(rangeA[0], rangeB[0]), Math.max(rangeA[1], rangeB[1])];
   }
 
-  static _textualRelation(relation) {
-    if (relation === -1) return '>';
-    if (relation === 0) return 'X';
-    if (relation === 1) return '<';
+  static _excludeRange(range, exclusion) {
+    const result = [];
+
+    if (exclusion[0] - range[0] > 0) {
+      result.push([range[0], exclusion[0]]);
+    }
+
+    if (range[1] - exclusion[1] > 0) {
+      result.push([exclusion[1], range[1]]);
+    }
+
+    return result;
   }
 
   constructor({ logger = console } = {}) {
@@ -55,7 +63,6 @@ class RangeList {
     for (let i = 0; i < this.ranges.length; i++) {
       const targetRange = this.ranges[i];
       const rangesRelation = RangeList._compareRanges(candidate, targetRange);
-      // console.log(`-- rangesRelation for ${targetRange} is ${RangeList._textualRelation(rangesRelation)}`);
       if (rangesRelation === -1) {
         updatedRanges.push(targetRange);
         continue;
@@ -80,7 +87,29 @@ class RangeList {
    */
   remove(range) {
     RangeList._validateRangeInput(range);
-    // TODO: implement this
+    const updatedRanges = [];
+    let rest = [];
+    let candidate = range;
+
+    for (let i = 0; i < this.ranges.length; i++) {
+      const targetRange = this.ranges[i];
+      const rangesRelation = RangeList._compareRanges(candidate, targetRange);
+      if (rangesRelation === -1) {
+        updatedRanges.push(targetRange);
+        continue;
+      }
+      if (rangesRelation === 0) {
+        const exclusionChunks = RangeList._excludeRange(targetRange, candidate);
+        exclusionChunks.forEach(chunk => updatedRanges.push(chunk));
+        continue;
+      }
+      if (rangesRelation === 1) {
+        rest = this.ranges.slice(i);
+        break;
+      }
+    }
+
+    this.ranges = updatedRanges.concat(rest);
   }
 
   /**
