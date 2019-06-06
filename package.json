@@ -1,0 +1,14 @@
+{
+  "name": "jerry-coding-test",
+  "version": "1.0.0",
+  "description": "coding test for jerry.ai",
+  "main": "RangeList.js",
+  "scripts": {
+    "test": "mocha ./test.js"
+  },
+  "author": "Karponter",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^6.1.4"
+  }
+}
